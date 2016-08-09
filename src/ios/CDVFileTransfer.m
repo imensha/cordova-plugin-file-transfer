@@ -425,8 +425,9 @@ static CFIndex WriteDataToStream(NSData* data, CFWriteStreamRef stream)
     BOOL trustAllHosts = [[command argumentAtIndex:2 withDefault:[NSNumber numberWithBool:NO]] boolValue]; // allow self-signed certs
     NSString* objectId = [command argumentAtIndex:3];
     NSDictionary* headers = [command argumentAtIndex:4 withDefault:nil];
-    NSTimeInterval timeout = [command argumentAtIndex:5 withDefault:60];
-    DLog(@"Request with timeout: %@ seconds", timeout);
+    NSNumber* timeout = [NSNumber numberWithInt:300];
+    // NSNumber* timeout = [command argumentAtIndex:5 withDefault:[NSNumber numberWithInt 300]];
+    NSLog(@"Request with timeout %@ seconds", timeout);
 
     CDVPluginResult* result = nil;
     CDVFileTransferError errorCode = 0;
@@ -462,7 +463,8 @@ static CFIndex WriteDataToStream(NSData* data, CFWriteStreamRef stream)
         return;
     }
 
-    NSMutableURLRequest* req = [NSMutableURLRequest requestWithURL:sourceURL timeoutInterval:timeout];
+    NSMutableURLRequest* req = [NSMutableURLRequest requestWithURL:sourceURL];
+    [req setTimeoutInterval:[timeout doubleValue]];
     [self applyRequestHeaders:headers toRequest:req];
 
     CDVFileTransferDelegate* delegate = [[CDVFileTransferDelegate alloc] init];
